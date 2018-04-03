@@ -11,13 +11,14 @@
 cd /users/oscgen/xwang/support/batch/load.vs.blocked
 # Global Defaults
 SYSTEM=$LMOD_SYSTEM_NAME
+WEEK=`date +%Y_week%U`
 
 processorusage=`showq -r | tail -5  | grep 'processors in use' | awk -F "(" '{print $NF}' | awk -F "%)" '{print $NR}'`
 nodeusage=`showq -r | tail -5  | grep 'nodes active' | awk -F "(" '{print $NF}' | awk -F "%)" '{print $NR}'`
 nodeusage_percent=`showq -r | tail -5  | grep 'nodes active' | awk -F "(" '{print $NF}' | awk -F ")" '{print $NR}'`
 TIME=`date +%T' '%D`
 
-cat <<EOF >>${SYSTEM}_Utilization.dat
+cat <<EOF >>${SYSTEM}_utilization_${WEEK}.dat
 -------------------------------------------------------------------------------------
 Time: $TIME
 The current node utilization on Oakley is $nodeusage_percent
@@ -29,10 +30,14 @@ fi
 
 /usr/local/sbin/blocked-jobs-summary.py > tmp.txt
 total=`cat tmp.txt |grep 'limit' | awk '{sum+=$1} END {print sum}'`
-echo "The total number of blocked jobs due to batch limit: $total" >> ${SYSTEM}_Utilization.dat
-echo "Detailed information:" >> ${SYSTEM}_Utilization.dat
-cat tmp.txt |grep 'limit' >> ${SYSTEM}_Utilization.dat
-echo "">> ${SYSTEM}_Utilization.da
+
+cat <<EOF >>${SYSTEM}_utilization_${WEEK}.dat
+The total number of blocked jobs due to batch limit: $total
+Detailed information:"
+EOF
+
+cat tmp.txt |grep 'limit' >> ${SYSTEM}_utilization_${WEEK}.dat
+
 rm tmp.txt
 
 
