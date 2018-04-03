@@ -1,4 +1,4 @@
-#PBS -N checkload
+#PBS -N job_checkload
 #PBS -S /bin/bash
 #PBS -j oe
 #PBS -l nodes=1:ppn=1
@@ -27,11 +27,12 @@ if [[ -f tmp.txt ]] ; then
 rm tmp.txt
 fi
 
-/usr/local/sbin/blocked-jobs-summary.py >tmp.txt
-total=`cat tmp.txt |grep 'HARD' | awk '{sum+=$1} END {print sum}'`
-echo "The total number of blocked jobs due to hard limit: $total" >> ${SYSTEM}_Utilization.dat
-echo "Detailed information:"
-cat tmp.txt |grep 'HARD' >> ${SYSTEM}_Utilization.dat
+/usr/local/sbin/blocked-jobs-summary.py > tmp.txt
+total=`cat tmp.txt |grep 'limit' | awk '{sum+=$1} END {print sum}'`
+echo "The total number of blocked jobs due to batch limit: $total" >> ${SYSTEM}_Utilization.dat
+echo "Detailed information:" >> ${SYSTEM}_Utilization.dat
+cat tmp.txt |grep 'limit' >> ${SYSTEM}_Utilization.dat
+echo "">> ${SYSTEM}_Utilization.da
 rm tmp.txt
 
 
